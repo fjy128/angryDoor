@@ -1,3 +1,6 @@
+/**
+ * 回调
+ **/
 const chalk = require('chalk')
 const http = require('http')
 const path = require('path')
@@ -17,21 +20,24 @@ const server = http.createServer((req, res) => {
     if (stats.isFile()) {
       res.statusCode = 200
       res.setHeader('Content-Type', 'text/plain')
+      fs.createReadStream(filePath).pipe(res)
       // fs.readFile(filePath, (err, data) => {
       //   console.log(data)
       // })
-      fs.createReadStream(filePath).pipe(res)
+    } else if (stats.isDirectory()) {
+      fs.readdir(filePath, (err, files) => {
+        if (err) {
+          res.statusCode = 404
+          res.setHeader('Content-Type', 'text/plain')
+          res.end(`${filePath}not find`)
+          return false
+        }
+        res.statusCode = 200
+        res.setHeader('Content-Type', 'text/plain')
+        res.end(files.join(','))
+      })
     }
   })
-
-  res.statusCode = 200
-  res.setHeader('Content-Type', 'text/html')
-  res.write('<html>')
-  res.write('<body>')
-  res.write('fjy 123334')
-  res.write('</body>')
-  res.write('</html>')
-  res.end('Hello World\n')
 })
 
 server.listen(conf.port, conf.hostname, () => {
