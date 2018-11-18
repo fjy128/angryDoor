@@ -1,11 +1,14 @@
 const fs = require('fs')
 const path = require('path')
-const Handlebars = require('handlebars')
-const promisify = require('util').promisify
-const stat = promisify(fs.stat)
+const Handlebars = require('handlebars')// 模版引擎
+const promisify = require('util').promisify// 解决回调问题
+const stat = promisify(fs.stat)// 读取文件信息
 const readdir = promisify(fs.readdir)
+const mime = require('./mime')// 文件类型
+const compress = require('./compress')// 文件压缩
+const range = require('./range')
 
-const tplPath = path.join(__dirname, '../template/dir.tpl')
+const tplPath = path.join(__dirname, '../template/dir.tpl')// 模版引擎
 const source = fs.readFileSync(tplPath)
 const config = require('../config/defaultConfig')
 const template = Handlebars.compile(source.toString(), 'utf-8')
@@ -15,9 +18,23 @@ module.exports = async function (req, res, filePath) {
     let isFile = stats.isFile()
     let isDirectory = stats.isDirectory()
     if (isFile) {
-      res.statusCode = 200
-      res.setHeader('Content-Type', 'text/plain')
-      fs.createReadStream(filePath).pipe(res)
+      const contentType = mime(filePath)
+      res.setHeader('Content-Type', contentType)
+      // fs.createReadStream(filePath).pipe(res)
+      let rs
+      const { code, start, end } = range(stats.size, req, res)
+      if (code === 200) {
+        res.statusCode = 200
+        rs = fs.createReadStream(filePath)
+      } else {
+        res.statusCode = 206
+        rs = fs.createReadStream(filePath, { start, end })
+      }
+      rs = fs.createReadStream(filePath)
+      if (filePath.match(config.compress)) { // 文件压缩
+        rs = compress(rs, req, res)
+      }
+      rs.pipe(res)
     } else if (isDirectory) {
       const files = await readdir(filePath)
       res.statusCode = 200
@@ -26,18 +43,14 @@ module.exports = async function (req, res, filePath) {
       const data = {
         title: path.basename(filePath),
         dir: dir ? `/${dir}` : '',
-        files
+        files: files.map(file => {
+          return {
+            file,
+            icon: mime(file)
+          }
+        })
       }
       res.end(template(data))
-      // try {
-      //   res.statusCode = 200
-      //   res.setHeader('Content-Type', 'text/plain')
-      //   res.end(files.join(','))
-      // } catch (err) {
-      //   res.statusCode = 404
-      //   res.setHeader('Content-Type', 'text/plain')
-      //   res.end(`${filePath}not found`)
-      // }
     } else {
       res.statusCode = 200
       res.setHeader('Content-Type', 'text/plain')

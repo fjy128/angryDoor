@@ -1,3 +1,12 @@
+/**
+ * 缓存
+ * 先判断本地有没有失效
+ * expires 绝对时间 一件
+ * Cache-Control 相对时间
+ * if-Modified-Since / Last-Modified 上次修改时间
+ * if-None-Match /ETag 表示文件一改变就会发生改变
+ **/
+
 const {
   cache
 } = require('../config/defaultConfig')
