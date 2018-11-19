@@ -18,7 +18,11 @@ handlebars--模版引擎: http://handlebarsjs.com/installation.html
 npm i -g angryDoor
 ```
 
-使用方法
+运行
+---
+node src/index.js
+
+使用方法 
 ---
 
 ```
@@ -30,4 +34,9 @@ angryDoor -h localhost #设置host为localhost
 
 angryDoor -d /usr #设置根目录为 /usr
 
+例如：
+node src/index.js --port=8000 
+
+
 ```
+

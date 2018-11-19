@@ -6,14 +6,14 @@ const stat = promisify(fs.stat) // 读取文件信息
 const readdir = promisify(fs.readdir)
 const mime = require('./mime') // 文件类型
 const compress = require('./compress') // 文件压缩
-const range = require('./range')
-const isFresh = require('./cache')
+const range = require('./range') // 获取指定字节
+const isFresh = require('./cache') // 缓存文件
 
 const tplPath = path.join(__dirname, '../template/dir.tpl') // 模版引擎
 const source = fs.readFileSync(tplPath)
-const config = require('../config/defaultConfig')
+// const config = require('../config/defaultConfig')
 const template = Handlebars.compile(source.toString(), 'utf-8')
-module.exports = async function (req, res, filePath) {
+module.exports = async function (req, res, filePath, config) {
   try {
     const stats = await stat(filePath)
     let isFile = stats.isFile()

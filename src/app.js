@@ -21,9 +21,6 @@ const server = http.createServer((req, res) => {
       res.statusCode = 200
       res.setHeader('Content-Type', 'text/plain')
       fs.createReadStream(filePath).pipe(res)
-      // fs.readFile(filePath, (err, data) => {
-      //   console.log(data)
-      // })
     } else if (stats.isDirectory()) {
       fs.readdir(filePath, (err, files) => {
         if (err) {

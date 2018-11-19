@@ -2,7 +2,7 @@
   "name": "angrydoor",
   "version": "1.0.0",
   "description": "This is a static resource service",
-  "main": "index.js",
+  "main": "src/app_promisify.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",

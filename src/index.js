@@ -1,28 +1,25 @@
-// const yargs = require('yags')
-const name = 'Chuloo'
-const map = Array.prototype.map
-const newName = map.call(name, eachLetter => {
-  return `${eachLetter}a`
-})
-console.log(newName) // ["Ca", "ha", "ua", "la", "oa", "oa"]
-
-const myUsers = [{
-  name: 'chuloo',
-  likes: 'grilled chicken'
-},
-{
-  name: 'chris',
-  likes: 'cold beer'
-},
-{
-  name: 'sam',
-  likes: 'fish biscuits'
-}
-]
-const usersByFood = myUsers.map(item => {
-  const container = {}
-  container[item.name] = item.likes
-  container.age = item.name.length * 10
-  return container
-})
-console.log(usersByFood)
+const yargs = require('yargs')
+const Server = require('./app_promisify')
+const argv = yargs
+  .usage('anywhere [option]')
+  .option('p', {
+    alias: 'prot',
+    describe: '端口号',
+    default: 9527
+  })
+  .option('h', {
+    alias: 'hostname',
+    describe: 'host',
+    default: '127.0.0.1'
+  })
+  .option('d', {
+    alias: 'root',
+    describe: 'root path',
+    default: process.cwd()
+  })
+  .version()
+  .alias('v', 'version')
+  .help()
+  .argv
+const server = new Server(argv)
+server.start()
