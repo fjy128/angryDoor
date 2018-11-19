@@ -11,13 +11,16 @@ supervisor--热更新，实时监测代码变化:https://www.npmjs.com/package/s
 
 handlebars--模版引擎: http://handlebarsjs.com/installation.html
 
-# 安装
+安装
+---
 
 ```
 npm i -g angryDoor
 ```
 
-# 使用方法
+使用方法
+---
+
 ```
 angryDoor # 把当前文件夹作为静态资源服务器根目录
 
