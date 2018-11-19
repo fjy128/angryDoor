@@ -1,7 +1,8 @@
 const fs = require('fs')
 const promisify = require('util').promisify
-const stat = promisify(fs.stat)
+const stat = promisify(fs.stat) // 读取文件基本信息
 const readdir = promisify(fs.readdir)
+// const isFresh = require('./cache')
 module.exports = async function (req, res, filePath) {
   try {
     const stats = await stat(filePath)
@@ -16,15 +17,6 @@ module.exports = async function (req, res, filePath) {
       res.statusCode = 200
       res.setHeader('Content-Type', 'text/plain')
       res.end(files.join(','))
-      // try {
-      //   res.statusCode = 200
-      //   res.setHeader('Content-Type', 'text/plain')
-      //   res.end(files.join(','))
-      // } catch (err) {
-      //   res.statusCode = 404
-      //   res.setHeader('Content-Type', 'text/plain')
-      //   res.end(`${filePath}not found`)
-      // }
     } else {
       res.statusCode = 200
       res.setHeader('Content-Type', 'text/plain')
