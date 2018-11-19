@@ -1,14 +1,15 @@
 const fs = require('fs')
 const path = require('path')
-const Handlebars = require('handlebars')// 模版引擎
-const promisify = require('util').promisify// 解决回调问题
-const stat = promisify(fs.stat)// 读取文件信息
+const Handlebars = require('handlebars') // 模版引擎
+const promisify = require('util').promisify // 解决回调问题
+const stat = promisify(fs.stat) // 读取文件信息
 const readdir = promisify(fs.readdir)
-const mime = require('./mime')// 文件类型
-const compress = require('./compress')// 文件压缩
+const mime = require('./mime') // 文件类型
+const compress = require('./compress') // 文件压缩
 const range = require('./range')
+const isFresh = require('./cache')
 
-const tplPath = path.join(__dirname, '../template/dir.tpl')// 模版引擎
+const tplPath = path.join(__dirname, '../template/dir.tpl') // 模版引擎
 const source = fs.readFileSync(tplPath)
 const config = require('../config/defaultConfig')
 const template = Handlebars.compile(source.toString(), 'utf-8')
@@ -21,14 +22,26 @@ module.exports = async function (req, res, filePath) {
       const contentType = mime(filePath)
       res.setHeader('Content-Type', contentType)
       // fs.createReadStream(filePath).pipe(res)
+      if (isFresh(stats, req, res)) {
+        res.statusCode = 304
+        res.end()
+        return
+      }
       let rs
-      const { code, start, end } = range(stats.size, req, res)
+      const {
+        code,
+        start,
+        end
+      } = range(stats.size, req, res)
       if (code === 200) {
         res.statusCode = 200
         rs = fs.createReadStream(filePath)
       } else {
         res.statusCode = 206
-        rs = fs.createReadStream(filePath, { start, end })
+        rs = fs.createReadStream(filePath, {
+          start,
+          end
+        })
       }
       rs = fs.createReadStream(filePath)
       if (filePath.match(config.compress)) { // 文件压缩
