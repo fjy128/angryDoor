@@ -1,7 +1,7 @@
 # angryDoor
 This is a static resource service
 
-# 首先安装辅助工具
+首先安装辅助工具
 ---
 
 chalk--控制台打印格式控制:https://www.npmjs.com/package/chalk
